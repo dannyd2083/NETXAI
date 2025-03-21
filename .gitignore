@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 *$py.class
+Classified_CSVs
+CTU-13-Dataset
+Processed_CSVs
 
 # C extensions
 *.so
