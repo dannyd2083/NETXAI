@@ -33,7 +33,6 @@ def prepare_data(train_df, val_df, test_df):
     # Split features and labels
     X_train = train_df.drop(columns=["Label"])
     y_train = train_df["Label"]
-
     X_val = val_df.drop(columns=["Label"])
     y_val = val_df["Label"]
 
