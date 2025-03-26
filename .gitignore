@@ -178,3 +178,12 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+#igoner the result
+Classified_CSVs/
+CTU-13-Dataset/
+Datasets/
+Feature_CSVs/
+Processed_CSVs/
+results/
