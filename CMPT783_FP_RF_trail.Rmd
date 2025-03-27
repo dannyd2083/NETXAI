@@ -1,0 +1,361 @@
+---
+title: "cmpt786_fp_random_forest"
+output: pdf_document
+date: "2025-03-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1 Setup
+
+### 1.1 Libraries
+
+Import the required libraries: 
+
+```{r lib,echo=TRUE}
+library(randomForest)
+library(ranger)
+```
+
+### 1.2 Data Setup
+
+Combined the malicious and normal datasets:
+
+```{r data,echo=FALSE, comment=FALSE}
+malicious <- read.csv("malicious_traffic.csv")
+malicious$maliciousornot <- 1
+normal <- read.csv("normal_traffic.csv")
+normal$maliciousornot <- 0
+all <- rbind(malicious, normal)
+
+# Ensure maliciousornot is a factor
+all$malicious <- as.factor(all$malicious)
+
+# Use h (which has NAs removed) instead of all
+if (!exists("h")) {
+  h <- na.omit(all)
+}
+
+```
+
+### 2.3 Train and Test Data Setup
+
+```{r train&test,echo=FALSE, comment=FALSE}
+# Set seed for reproducibility
+set.seed(20876049)
+
+# Define N and K
+N <- nrow(h)
+K <- 5
+
+# Adjust N to be divisible by K (to avoid the earlier warning)
+N_adjusted <- N - (N %% K)
+
+# Create a matrix of indices for K-fold cross-validation
+ind <- matrix(sample(1:N, size = N_adjusted), ncol = K)
+
+# Define the column names (including the response variable)
+namestt <- 
+  c("StartTime", "Dur", "Proto", "SrcAddr", "Sport", "Dir", "DstAddr",  
+    "Dport", "State", "sTos", "dTos", "TotPkts", "TotBytes", "SrcBytes", 
+    "Label", "maliciousornot")
+
+# Use the first fold as the test set and the remaining folds as the training set
+test_indices <- ind[, 1]  # First fold for testing
+train_indices <- unlist(as.list(ind[, -1]))  # Remaining folds for training
+
+# Create the training and test sets
+dtrain <- h[train_indices, ]
+dtest <- h[test_indices, ]
+
+# Set column names
+colnames(dtrain) <- namestt
+colnames(dtest) <- namestt
+
+# Verify the sizes
+cat("Training set size:", nrow(dtrain), "\n")
+cat("Test set size:", nrow(dtest), "\n")
+
+h <- na.omit(dtrain)
+```
+
+\newpage
+## 2.1 Measuring the most suitable number of variables for the best model 
+
+From the above, we could observe the lowest point is at 2 or 4, such that the most suitable number of variables for the best model is 2 or 4. Between the two numbers, since 2 is considerablely small and there will be limited information explained by 2 variables, we choose 4 as the most suitable number of variables for the best model.
+
+```{r newranger}
+# Set seed for reproducibility
+set.seed(12345)
+
+# Check the number of rows after removing NAs
+N <- nrow(dtrain)
+cat("Number of rows in h:", N, "\n")
+
+# Split into training and test sets (2/3 train, 1/3 test)
+N_train <- round(2 * N / 3)
+N_test <- N - N_train
+id.train <- sample(1:N, N_train, replace = FALSE)
+id.test <- setdiff(1:N, id.train)
+
+# Use ranger for better memory efficiency
+library(ranger)
+
+# Train random forest on a smaller sample first to test
+# Take a sample of 10,000 rows from the training set
+set.seed(12345)
+train_sample <- h[id.train, ][sample(N_train, 10000), ]
+
+# Run random forest with ranger
+h.rf <- ranger(
+  maliciousornot ~ StartTime + Dur + Proto + SrcAddr + Sport + Dir + 
+    DstAddr + Dport + State + sTos + dTos + TotPkts + TotBytes + 
+    SrcBytes + Label, data = train_sample, num.trees = 100, mtry = 7,
+  importance = "impurity"
+)
+
+# Print the model
+print(h.rf)
+
+# Function to get explanatory variable names (fixed for ranger)
+get.explanatory_varnames <- function(model) {
+  return(model$forest$independent.variable.names)
+}
+
+# Prepare data for cross-validation
+trainy <- as.factor(h[id.train, "maliciousornot"])  # Ensure factor for classification
+trainx <- h[id.train, get.explanatory_varnames(h.rf)]
+
+# Five-fold cross-validation on a sample to save memory
+library(randomForest)
+fb.rfcv <- rfcv(trainx = trainx[1:10000, ], trainy = trainy[1:10000], cv.fold = 5)
+
+# Plot the results
+with(fb.rfcv, plot(n.var, error.cv, pch = 19, type = "b", col = "blue"))
+
+```
+
+\newpage
+## 2.2 Measuring the importance of Explanatory variables 
+
+Due to the randomness, we run the following code for a few times. We need to choose the variables with the largest importance calculated. Based on the results, we could decide which variables have frequently appeared as the first four most important variables, that will be used for the following processes. The final decided variables are Label, Sport, SrcAddr and StartTime.
+
+```{r imp,echo=TRUE}
+### The type = 2 importance records the drop in RSS
+importance(h.rf, type=2)
+### The type = 1 importance records average decrease 
+### in the accuracy of predictions
+importance(h.rf, type=1)
+
+### This is based on the average decrease in the accuracy of predictions 
+### on “out of bag” samples when that variate is excluded from the model. 
+### We will work primarily with the easier to comprehend type=1 measure of importance.
+importance <- h.rf$variable.importance
+importance_sorted <- sort(importance, decreasing = TRUE)
+barplot(importance_sorted, 
+        las = 2,  # Rotate x-axis labels for readability
+        main = "Variable Importance (Ranger)", 
+        ylab = "Importance")
+
+### Running the code below with different set of seeds, 
+### e.g. 123:543, 6789:7245, 20875800:20876099, 208758:208360,...
+t2 <- rep(0,30)
+t1 <- rep(0,30)
+for (i in (6789:7245)){
+  set.seed(i)
+  h <- na.omit(all)
+  N <- nrow(h)
+  N_train <- round(2*N /3)
+  N_test <- N - N_train
+  # Select the two sample units
+  id.train <- sample(1:N, N_train, replace=FALSE)
+  id.test <- setdiff(1:N, id.train)
+  # Run random forest with ranger
+  h.rf <- ranger(
+    maliciousornot ~ StartTime + Dur + Proto + SrcAddr + Sport + Dir + DstAddr + 
+    Dport + State + sTos + dTos + TotPkts + TotBytes + SrcBytes + Label,
+  data = train_sample, 
+  num.trees = 100,  # Reduce number of trees to save memory
+  mtry = 7,
+  importance = "impurity"
+)
+  # The type = 2 importance records the drop in RSS
+  i2 <- importance(h.rf, type=2)
+  for (i in 1:30) {
+    t2[i] <- t2[i] + i2[i]
+  }
+  i1 <- importance(h.rf, type=1)
+  for (i in 1:30) {
+    t1[i] <- t1[i] + i1[i]
+  }
+}
+t1
+t2
+```
+## 2.3 Error calculation algorithms used 
+### 2.3.1 Functions for cross validation
+
+```{r valid_train_functions, echo=TRUE}
+# Set seed for reproducibility
+set.seed(20876049)
+
+# Define N as the number of rows in the dataset
+N <- nrow(h)  # Assuming h is your dataset (from previous code)
+K <- 5
+
+# Adjust N to be divisible by K
+N_adjusted <- N - (N %% K)
+
+# Create a matrix of indices for K-fold cross-validation
+ind <- matrix(sample(1:N, size = N_adjusted), ncol = K)
+
+# Function to create the test set
+testr <- function(data, indices) {
+  indices <- indices[[1]][, 1]  # Extract the first column of indices
+  te <- data[indices, ]  # Directly subset the data frame
+  return(te)
+}
+
+# Function to create the training set
+trainr <- function(data, indices) {
+  indices <- indices[[1]]  # Extract the indices
+  tr <- data[-indices, ]  # Exclude the test indices
+  return(tr)
+}
+
+# Define the column names (predictors)
+namestt <- 
+  c("StartTime", "Dur", "Proto", "SrcAddr", "Sport", "Dir", "DstAddr",  
+    "Dport", "State", "sTos", "dTos", "TotPkts", "TotBytes", "SrcBytes", 
+    "Label", "maliciousornot")
+```
+
+\newpage
+### 2.3.2 5-fold cross validation mean error
+
+```{r newtrain}
+# Initialize vector to store accuracy for each fold
+accuracy <- c()
+error <- c()
+for (k in 1:5) {
+  cur_ind <- list(subset(ind, select = k))
+  train <- trainr(h, cur_ind)
+  test <- testr(dtrain, cur_ind)
+  colnames(train) <- namestt
+  colnames(test) <- namestt
+
+  # Sample the training data to avoid memory issues
+  train <- train[sample(nrow(train), 10000), ]
+  
+  # Train the ranger model 
+  h.bag <- ranger(
+    maliciousornot ~ StartTime + Dur + Sport + Label, data = train,
+    importance = "impurity"
+    )
+  
+  # Predict on the test set
+  pred <- predict(h.bag, data = test)$predictions 
+  
+  # Get actual values
+  actual <- test$maliciousornot
+  
+  # Ensure consistent factor levels
+  pred <- factor(pred, levels = c("0", "1"))
+  actual <- factor(actual, levels = c("0", "1"))
+
+  # Calculate accuracy for classification
+  acc <- mean(pred == actual, na.rm = TRUE)
+
+  # Calculate misclassification error = 1 - accuracy
+  e <- 1 - acc
+  error[k] <- e
+}
+
+# The mean misclassification error
+mean(error)
+```
+
+### 2.3.3 Out Of Bag Error 
+
+```{r oob, echo=TRUE}
+h.bag <- ranger(
+    maliciousornot ~ StartTime + Dur + Sport + Label,
+  data = h)
+pred <- h.bag$predictions
+actual <- h$maliciousornot
+e = sqrt(mean((pred-actual)^2))
+e
+```
+
+The chosen model is the model built from random forest (or ranger), with 4 variables of StartTime, Dur, Sport and Label.
+
+\newpage
+## 2.4 Choosing mtry 
+### for the best model built with 4 variables
+
+The following code calculates the combination error of both 5-folds cross validation mean error and Out of Bag error for the best model built with 4 variables for mtry from 1 to 4.
+
+For consideration of randomness, we run the code below for several times. The lowest combination error of both 5-folds cross validation mean error and Out Of Bag error is at mtry equal to 3, then we obtain the most suitable mtry is around 3. 
+
+```{r mtry, echo=TRUE}
+### 5-folds cross validation mean error for mtry from 1-4
+merror <- c()
+for (mt in 1:4){
+  accuracy <- c()
+  error <- c()
+  for (k in 1:5) {
+    cur_ind <- list(subset(ind, select = k))
+    train <- trainr(h, cur_ind)
+    test <- testr(dtrain, cur_ind)
+    colnames(train) <- namestt
+    colnames(test) <- namestt
+    train <- train[sample(nrow(train), 10000), ]
+    # Train the ranger model 
+    h.bag <- ranger(
+      maliciousornot ~ StartTime + Dur + Sport + Label, data = train,
+      mtry = mt, importance = "impurity"
+      )
+    # Predict on the test set
+    pred <- predict(h.bag, data = test)$predictions 
+    # Get actual values
+    actual <- test$maliciousornot 
+    # Ensure consistent factor levels
+    pred <- factor(pred, levels = c("0", "1"))
+    actual <- factor(actual, levels = c("0", "1"))
+    # Calculate accuracy for classification
+    acc <- mean(pred == actual, na.rm = TRUE)
+    # Calculate misclassification error = 1 - accuracy
+    e <- 1 - acc
+    error[k] <- e
+  }
+   merror[mt] <- mean(error)
+}
+merror
+
+### Out Of Bag Error for ranges of mtry from 1-4
+es <- c()
+for (mt in 1:4){
+  h.bag <- ranger(
+      maliciousornot ~ StartTime + Dur + Sport + Label,
+      data = h, mtry = mt)
+  pred <- h.bag$predictions
+  actual <- h$maliciousornot
+  e = sqrt(mean((pred-actual)^2))
+  es[mt] = e
+}
+es
+combined_error = es + merror
+
+bp <- barplot(
+  combined_error,
+  names.arg = c("1", "2", "3", "4"),
+  xlab = "mtry Value",
+  ylab = "Combined Error (OOB + Cross-Validation)",
+  main = "Errors for the Chosen Random Forest Model \n with Different mtry Values",
+  col = "steelblue",
+  border = "black"
+)
+text(bp, combined_error, labels = round(combined_error, 4), pos = 3)
+```
