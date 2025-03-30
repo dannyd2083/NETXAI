@@ -67,9 +67,9 @@ def extract_features(df):
     # Compute packet rate
     df["PktRate"] = df["TotPkts"] / df["Dur"].replace(0, np.nan)
     # Compute byte rate
-    df["ByteRate"] = df["TotBytes"] / df["Dur"].replace(0, np.nan)  # 计算字节速率
+    df["ByteRate"] = df["TotBytes"] / df["Dur"].replace(0, np.nan)
     # Compute Flow Portion
-    df["SrcRatio"] = df["SrcBytes"] / df["TotBytes"].replace(0, np.nan)  # 计算流向比例
+    df["SrcRatio"] = df["SrcBytes"] / df["TotBytes"].replace(0, np.nan)
 
     # Compute status transform matrix
     transition_matrix = compute_transition_matrix(df)
@@ -84,11 +84,11 @@ def filter_flows(df):
     Filter flows based on the rule defined in the paper: only keep duration < 30 min
     """
     df = df[df["TotalDur"] < 30 * 60]
-    df = infer_connection_state(df)
+    # df = infer_connection_state(df)
 
-    # 仅保留已完成三次握手的TCP连接 或 UDP 连接
-    # Only keep connections that complete TCP 3-way handshake
-    df = df[(df["ConnectionState"] == "Handshake Completed") | (df["ConnectionState"] == "No Handshake (UDP)")]
+    # # 仅保留已完成三次握手的TCP连接 或 UDP 连接
+    # # Only keep connections that complete TCP 3-way handshake
+    # df = df[(df["ConnectionState"] == "Handshake Completed") | (df["ConnectionState"] == "No Handshake (UDP)")]
 
     return df
 
