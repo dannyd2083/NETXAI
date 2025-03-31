@@ -1,115 +1,86 @@
 import pandas as pd
 import numpy as np
+import argparse
 import os
 
 
-def load_data(csv_path):
-    """
-    Read Traffic Data from:
-    Classified_CSVs/malicious_traffic.csv
-    Classified_CSVs/normal_traffic.csv
-    """
-    df = pd.read_csv(csv_path, parse_dates=["StartTime"])
-    
-    # Calculate duration
-    flow_group = ["SrcAddr", "DstAddr", "Sport", "Dport", "Proto"]
-    df["TotalDur"] = df.groupby(flow_group)["Dur"].transform("sum")
+def feature_extraction(input_csv, output_csv, addFea):
+    # read original data source
+    df = pd.read_csv(input_csv)
 
-    return df
-
-def infer_connection_state(df):
-    """
-    From Label deduce connection state
-    """
-    def get_state(label):
-        if "TCP" in label:
-            if "Established" in label:
-                return "Handshake Completed"
-            else:
-                return "Handshake Not Completed"
-        elif "UDP" in label:
-            return "No Handshake (UDP)"
-        return "Unknown"
-
-    df["ConnectionState"] = df["Label"].apply(get_state)
-    return df
-
-def compute_transition_matrix(df):
-    """
-    Calculate state transform matrix based on TotBytes
-    """
-    states = [200, 800, np.inf]  # define status boundary
-    transition_matrix = np.zeros((3, 3))
-
-    prev_state = None
-    for bytes_count in df["TotBytes"]:
-        if bytes_count < states[0]:
-            state = 0
-        elif bytes_count < states[1]:
-            state = 1
-        else:
-            state = 2
-
-        if prev_state is not None:
-            transition_matrix[prev_state, state] += 1
-        prev_state = state
-
-    # Normalization
-    row_sums = transition_matrix.sum(axis=1, keepdims=True)
-    transition_matrix = np.divide(transition_matrix, row_sums, where=row_sums != 0)
-
-    return transition_matrix
-
-def extract_features(df):
-    """
-    Extract Statistics features
-    """
-    # Compute packet rate
-    df["PktRate"] = df["TotPkts"] / df["Dur"].replace(0, np.nan)
-    # Compute byte rate
-    df["ByteRate"] = df["TotBytes"] / df["Dur"].replace(0, np.nan)
-    # Compute Flow Portion
+    # Extract original feature fields
+    selected_columns = [
+        "Dur",         # Flow duration
+        "TotPkts",     # Total packets
+        "TotBytes",    # Total bytes
+        "SrcBytes",    # Source bytes
+        "Proto",       # Protocol (TCP/UDP)
+        "Dir"          # Direction (-> or <-)
+    ]
+    # print(addFea)
+    for addfeature in addFea:
+        selected_columns.append(addfeature)
+    # print(selected_columns)
+    df = df[selected_columns].copy()
+    # Calculate SrcRatio
     df["SrcRatio"] = df["SrcBytes"] / df["TotBytes"].replace(0, np.nan)
+    df["SrcRatio"] = df["SrcRatio"].fillna(0.0)
 
-    # Compute status transform matrix
-    transition_matrix = compute_transition_matrix(df)
-    for i in range(3):
-        for j in range(3):
-            df[f"tm_{i}_{j}"] = transition_matrix[i, j]
+    # Calculate Packet Rate and Byte Rate
+    df["PktRate"] = df["TotPkts"] / df["Dur"].replace(0, np.nan)
+    df["ByteRate"] = df["TotBytes"] / df["Dur"].replace(0, np.nan)
+    df["PktRate"] = df["PktRate"].fillna(0.0)
+    df["ByteRate"] = df["ByteRate"].fillna(0.0)
 
-    return df
+    # Statistical Proto fields
+    df["Proto"] = df["Proto"].map({"tcp": 0, "udp": 1}).fillna(-1)
 
-def filter_flows(df):
-    """基于论文算法筛选流
-    Filter flows based on the rule defined in the paper: only keep duration < 30 min
-    """
-    df = df[df["TotalDur"] < 30 * 60]
-    # df = infer_connection_state(df)
+    # Statistical Direction field
+    df["Dir"] = df["Dir"].str.strip()
+    df["Dir"] = df["Dir"].map({"->": 1, "<-": 0}).fillna(-1)
 
-    # # 仅保留已完成三次握手的TCP连接 或 UDP 连接
-    # # Only keep connections that complete TCP 3-way handshake
-    # df = df[(df["ConnectionState"] == "Handshake Completed") | (df["ConnectionState"] == "No Handshake (UDP)")]
 
-    return df
+    # # Final feature columns
+    feature_columns = [
+        "Dur", "TotPkts", "TotBytes", "SrcBytes",
+        "SrcRatio", "PktRate", "ByteRate",
+        "Proto", "Dir"
+    ]
 
-def process_csv(csv_path, output_csv):
-    """
-    Run Feature Execution
-    """
-    output_dir = "Feature_CSVs"
-    output_path = os.path.join(output_dir, output_csv)
-    os.makedirs(output_dir, exist_ok=True)
-    df = load_data(csv_path)
-    df = filter_flows(df)
-    df = extract_features(df)
+    if "Sport" in selected_columns:
+        # Handle Sport (source port) using top-N one-hot encoding
+        top_ports = df["Sport"].value_counts().head(20).index
+        df["Sport_cat"] = df["Sport"].apply(lambda x: str(x) if x in top_ports else "other")
+        sport_dummies = pd.get_dummies(df["Sport_cat"], prefix="Sport").astype(int)
+        df = pd.concat([df, sport_dummies], axis=1)
+        feature_columns +=  list(sport_dummies.columns)
+        
 
-    # Output columns
-    feature_cols = ["PktRate", "ByteRate", "SrcRatio"] + [f"tm_{i}_{j}" for i in range(3) for j in range(3)]
-    df[feature_cols].to_csv(output_path, index=False)
+
+
+    # Save to output CSV
+    df[feature_columns].to_csv(output_csv, index=False)
+    print(f"Feature extraction completed. Output saved to {output_csv}")
+
+
+if __name__ ==  "__main__":
+    parser = argparse.ArgumentParser(description="Train XGBoost model on flow-level features.")
+    parser.add_argument("--sport", action="store_true", help="Include Sport feature (default: False)")
+    args = parser.parse_args()
+    Sport_flag = args.sport
+    # print(Sport_flag)
     
-    print(f"Processed data saved to {output_csv}")
+    addFea = []
+    if Sport_flag:
+        addFea.append("Sport")
 
+    outdir = "Feature_CSVs"
+    os.makedirs(outdir, exist_ok=True)
+    input_csv = "Classified_CSVs/normal_traffic.csv"
+    output_csv = outdir + "/normal_feature.csv"
+    feature_extraction(input_csv, output_csv, addFea)
 
-if __name__ == "__main__":
-    process_csv("Classified_CSVs/normal_traffic.csv", "features_normal.csv")
-    process_csv("Classified_CSVs/malicious_traffic.csv", "features_malicious.csv")
+    input_csv = "Classified_CSVs/malicious_traffic.csv"
+    output_csv = outdir + "/malicious_feature.csv"
+    feature_extraction(input_csv, output_csv, addFea)
+
