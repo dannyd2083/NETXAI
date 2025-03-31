@@ -49,4 +49,4 @@ if __name__ == "__main__":
     # Execute the dataset splitting
     savedir = "Datasets"
     os.makedirs(savedir, exist_ok=True)
-    split_malicious_and_normal("Feature_CSVs/features_malicious.csv", "Feature_CSVs/features_normal.csv", savedir)
+    split_malicious_and_normal("Feature_CSVs/malicious_feature.csv", "Feature_CSVs/normal_feature.csv", savedir)
