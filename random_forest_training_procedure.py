@@ -115,25 +115,4 @@ The best features for new data found are the following:
 max_features = 6       → Avg CV F1 Error: 0.0273
 n_estimators = 150     → Avg CV F1 Error: 0.0272
 max_depth = 20      → Avg CV F1 Error: 0.0263
-
-The following was the result for new data
-max_features = sqrt    → Avg CV F1 Error: 0.0281
-max_features = log2    → Avg CV F1 Error: 0.0281
-max_features = None    → Avg CV F1 Error: 0.0280
-max_features = 2       → Avg CV F1 Error: 0.0291
-max_features = 4       → Avg CV F1 Error: 0.0275
-max_features = 6       → Avg CV F1 Error: 0.0273
-max_features = 8       → Avg CV F1 Error: 0.0276
-max_features = 10      → Avg CV F1 Error: 0.0280
-n_estimators = 10      → Avg CV F1 Error: 0.0297
-n_estimators = 50      → Avg CV F1 Error: 0.0275
-n_estimators = 100     → Avg CV F1 Error: 0.0273
-n_estimators = 150     → Avg CV F1 Error: 0.0272
-n_estimators = 200     → Avg CV F1 Error: 0.0272
-max_depth = None    → Avg CV F1 Error: 0.0272
-max_depth = 2       → Avg CV F1 Error: 0.1268
-max_depth = 5       → Avg CV F1 Error: 0.0800
-max_depth = 10      → Avg CV F1 Error: 0.0419
-max_depth = 20      → Avg CV F1 Error: 0.0263
-max_depth = 30      → Avg CV F1 Error: 0.0269
 """
