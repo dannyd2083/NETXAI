@@ -3,9 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 Classified_CSVs
-CTU-13-Dataset
+CTU*
 Processed_CSVs
-Datasets
+Datasets*
 Feature_CSVs
 .DS_Store
 

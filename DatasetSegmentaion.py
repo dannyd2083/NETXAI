@@ -13,6 +13,8 @@ def split_malicious_and_normal(malicious_csv, normal_csv, savedir):
     # Load CSV files
     mal_df = pd.read_csv(malicious_csv)
     normal_df = pd.read_csv(normal_csv)
+    column_names = mal_df.columns.tolist()
+
 
     # Assign labels: 1 = Malicious traffic, 0 = Normal traffic
     mal_df["Label"] = 1
@@ -31,13 +33,15 @@ def split_malicious_and_normal(malicious_csv, normal_csv, savedir):
     val_df = pd.concat([mal_val, normal_val], ignore_index=True).sample(frac=1, random_state=42)
     test_df = pd.concat([mal_test, normal_test], ignore_index=True).sample(frac=1, random_state=42)
 
+    """
     # Save the split datasets
     train_path = os.path.join(savedir, "train_set.csv")
     val_path = os.path.join(savedir, "val_set.csv")
     test_path = os.path.join(savedir, "test_set.csv")
     train_df.to_csv(train_path, index=False)
     val_df.to_csv(val_path, index=False)
-    test_df.to_csv(test_path, index=False)
+    test_df.to_csv(test_path, index=False)"
+    """
 
     print("Dataset splitting completed!")
     print(f"Training set: {len(train_df)} samples (Malicious: {len(mal_train)}, Normal: {len(normal_train)})")
@@ -49,4 +53,5 @@ if __name__ == "__main__":
     # Execute the dataset splitting
     savedir = "Datasets"
     os.makedirs(savedir, exist_ok=True)
+    # split_malicious_and_normal("CTU13-CSV-Dataset-main/CTU13_Attack_Traffic.csv", "CTU13-CSV-Dataset-main/CTU13_Normal_Traffic.csv", savedir)
     split_malicious_and_normal("Feature_CSVs/malicious_feature.csv", "Feature_CSVs/normal_feature.csv", savedir)
