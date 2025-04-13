@@ -64,12 +64,18 @@ def prepare_data(train_df, val_df, test_df):
     return X_train_scaled, y_train, X_val_scaled, y_val, X_test_scaled, y_test, X_train.columns.tolist()
 
 
-def optimize_parameters(X_train, y_train, X_val, y_val):
+def optimize_parameters(X_train, y_train, X_val, y_val, skip=False):
     """
     Find optimal parameters for Logistic Regression using validation set
     Only use compatible solver/penalty combinations
     """
+    if skip:
+        print("Skip optimize parameters process and use previous best parameters!")
+        best_params = {'C': 1.0, 'penalty': 'l2', 'solver': 'lbfgs', 'max_iter': 1000}
+        return best_params
+
     print("Finding optimal parameters...")
+
 
     # Define valid parameter combinations
     param_combinations = [
@@ -313,8 +319,7 @@ def main(feature_set_name="basic"):
     X_train, y_train, X_val, y_val, X_test, y_test, feature_names = prepare_data(train_df, val_df, test_df)
 
     # # Optimize parameters -- Only run once!!!
-    # best_params = optimize_parameters(X_train, y_train, X_val, y_val)
-    best_params = {'C': 1.0, 'penalty': 'l2', 'solver': 'lbfgs', 'max_iter': 1000}
+    best_params = optimize_parameters(X_train, y_train, X_val, y_val, skip=True)
 
     # Train model
     lr_model = train_logistic_regression(X_train, y_train, best_params)
