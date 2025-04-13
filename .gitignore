@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+.DS_Store
 .idea
 *.py[cod]
 *$py.class
@@ -8,7 +9,7 @@ CTU*
 Processed_CSVs
 Datasets*
 features*
-.DS_Store
+.DS_Storeg
 
 # C extensions
 *.so
