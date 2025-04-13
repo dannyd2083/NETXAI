@@ -114,18 +114,17 @@ def make_radar_chart_cic(data, labels, model_labels, feature_set, save_path):
 
 
 
-def main():
+def main(feature_set="basic"):
     output_dir = os.path.join("results", "radar")
     os.makedirs(output_dir, exist_ok=True)
 
-    for feature_set in ["basic", "cicflowmeter"]:
-        folder = os.path.join("results", feature_set)
-        model_names, metric_labels, score_matrix = load_results_from_folder(folder)
-        save_path = os.path.join(output_dir, f"radar_{feature_set}.png")
-        if feature_set == "basic":
-            make_radar_chart_basic(score_matrix, metric_labels, model_names, feature_set, save_path)
-        else:
-            make_radar_chart_cic(score_matrix, metric_labels, model_names, feature_set, save_path)
+    folder = os.path.join("results", feature_set)
+    model_names, metric_labels, score_matrix = load_results_from_folder(folder)
+    save_path = os.path.join(output_dir, f"radar_{feature_set}.png")
+    if feature_set == "basic":
+        make_radar_chart_basic(score_matrix, metric_labels, model_names, feature_set, save_path)
+    else:
+        make_radar_chart_cic(score_matrix, metric_labels, model_names, feature_set, save_path)
 
 
 if __name__ == "__main__":
