@@ -8,6 +8,7 @@ from sklearn.metrics import (
 
 from result_utils import save_results_to_csv
 from shap_utils import generate_and_save_shap_plots
+import time
 
 
 def load_split_data(split_dir):
@@ -98,9 +99,11 @@ def main():
 
     feature_sets = ["basic", "cicflowmeter"]
     for fs in feature_sets:
+        start_time = time.time()
         output_dir = os.path.join("results", fs)
         process_feature_set(fs, output_dir)
-
+        end_time = time.time()
+        print("XGBoost Model Takes {} seconds.".format(end_time-start_time))
 
 if __name__ == "__main__":
     main()

@@ -11,11 +11,12 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, matthews_corrcoef
 from sklearn.model_selection import cross_val_score
-from shap_utils import generate_and_save_shap_plots
 from result_utils import save_results_to_csv
+import time
 
 
 def train_model(train_csv, val_csv, test_csv, feature_set_name="basic"):
+    start_time = time.time()
     # Load datasets
     train_df = pd.read_csv(train_csv)
     val_df = pd.read_csv(val_csv)  # Not used currently
@@ -79,9 +80,12 @@ def train_model(train_csv, val_csv, test_csv, feature_set_name="basic"):
         save_path=result_csv
     )
 
+    end_time = time.time()
+    print("Random Forest Model Takes {} seconds.".format(end_time-start_time))
 
     return model
 
 
 # Execute model training
 model = train_model("data_splits/basic/train.csv", "data_splits/basic/val.csv", "data_splits/basic/test.csv", feature_set_name="basic")
+model = train_model("data_splits/cicflowmeter/train.csv", "data_splits/cicflowmeter/val.csv", "data_splits/cicflowmeter/test.csv", feature_set_name="cicflowmeter")
