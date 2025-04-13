@@ -17,7 +17,9 @@ def process_original_to_csv(file_pattern):
 
     # process files
     for file in file_list:
-        dataset_number = file.split("/")[-2]
+        normalized_file = os.path.normpath(file)
+        split_path = normalized_file.split(os.sep)
+        dataset_number = split_path[-2] if len(split_path) > 2 else "unknown"
         df = pd.read_csv(file)
         # set output filename
         output_file = os.path.join(output_dir, f"capture_{dataset_number}.csv")
