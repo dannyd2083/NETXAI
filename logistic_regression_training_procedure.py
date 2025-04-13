@@ -1,6 +1,14 @@
 ## To find the best params for logistic regression model
 ## For the same data only run once, because it takes a long time
 
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+import os
+
+
 
 def load_datasets(train_csv, val_csv, test_csv):
     """
