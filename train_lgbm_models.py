@@ -3,8 +3,12 @@
 import pandas as pd
 import lightgbm as lgb
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, matthews_corrcoef
+import os
+from result_utils import save_results_to_csv
+import time
 
-def train_model(train_csv, val_csv, test_csv):
+def train_model(train_csv, val_csv, test_csv, feature_set_name="basic"):
+    start_time = time.time()
     # Load datasets
     train_df = pd.read_csv(train_csv)
     val_df = pd.read_csv(val_csv)
@@ -50,10 +54,26 @@ def train_model(train_csv, val_csv, test_csv):
     print(f"Matthews Correlation Coefficient: {mcc:.4f}")
     print(f"Test Error: {1 - acc:.4f}")
 
+
+    # Save results
+    metrics = [acc, precision, recall, f1, mcc]
+    result_dir = os.path.join("results", feature_set_name)
+    os.makedirs(result_dir, exist_ok=True)
+    result_csv = os.path.join(result_dir, "lgbm_results.csv")
+    save_results_to_csv(
+        results_dict={feature_set_name: metrics},
+        metric_names=["Accuracy", "Precision", "Recall", "F1-score", "MCC"],
+        save_path=result_csv
+    )
+    process_time = time.time() - start_time
+    print("LightGBM Model Takes {} seconds.".format(process_time))
+
     return best_model
 
 # Execute model training with LightGBM
-model = train_model("Datasets/train_set.csv", "Datasets/val_set.csv", "Datasets/test_set.csv")
+# Execute model training
+model = train_model("data_splits/basic/train.csv", "data_splits/basic/val.csv", "data_splits/basic/test.csv", feature_set_name="basic")
+model = train_model("data_splits/cicflowmeter/train.csv", "data_splits/cicflowmeter/val.csv", "data_splits/cicflowmeter/test.csv", feature_set_name="cicflowmeter")
 
 # Evaluation on Test Set:
 # Accuracy : 0.9625
