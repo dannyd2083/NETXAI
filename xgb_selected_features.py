@@ -7,9 +7,7 @@ from sklearn.metrics import matthews_corrcoef
 
 def train_model(train_csv, val_csv, test_csv):
 
-    # selected_features = ["Dur","TotPkts","TotBytes","SrcBytes","SrcRatio","PktRate","ByteRate","Proto","Dir"]
-    selected_features = ["Bwd Pkt Len Max", "Fwd IAT Mean", "Tot Fwd Pkts", "Fwd IAT Min", "TotLen Fwd Pkts", "Bwd IAT Mean", "TotLen Bwd Pkts", "Bwd IAT Min", "Pkt Len Var"]
-    # Load datasets
+    selected_features = ["Dur","TotPkts","TotBytes","SrcBytes","SrcRatio","PktRate","ByteRate","Proto","Dir"]
     train_df = pd.read_csv(train_csv)
     val_df = pd.read_csv(val_csv)  # not used in this version, but loaded for possible future tuning
     test_df = pd.read_csv(test_csv)
@@ -83,7 +81,7 @@ def train_model(train_csv, val_csv, test_csv):
     return model
 # Execute model training
 # model = train_model("Datasets/train_set.csv", "Datasets/val_set.csv", "Datasets/test_set.csv")
-model = train_model("Datasets_test/train_set.csv", "Datasets_test/val_set.csv", "Datasets_test/test_set.csv")
+model = train_model("data_splits/basic/train.csv", "data_splits/basic/val.csv", "data_splits/basic/test.csv")
 
 
 
