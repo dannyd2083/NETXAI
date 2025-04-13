@@ -42,7 +42,7 @@ def train_xgb_classifier(X_train, y_train, X_val, y_val):
     model.fit(
         X_train, y_train,
         eval_set=[(X_val, y_val)],
-        verbose=True
+        verbose=False
     )
 
     return model

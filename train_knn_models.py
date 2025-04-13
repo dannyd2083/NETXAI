@@ -20,9 +20,9 @@ def load_datasets(train_csv, val_csv, test_csv):
     val_df = pd.read_csv(val_csv)
     test_df = pd.read_csv(test_csv)
 
-    print(f"Training set: {len(train_df)} samples")
-    print(f"Validation set: {len(val_df)} samples")
-    print(f"Test set: {len(test_df)} samples")
+    # print(f"Training set: {len(train_df)} samples")
+    # print(f"Validation set: {len(val_df)} samples")
+    # print(f"Test set: {len(test_df)} samples")
 
     return train_df, val_df, test_df
 
@@ -41,7 +41,7 @@ def prepare_data(train_df, val_df, test_df):
     y_test = test_df["Label"]
 
     # Handle missing values with imputation
-    print("Handling missing values...")
+    # print("Handling missing values...")
     imputer = SimpleImputer(strategy='mean')
     X_train_imputed = imputer.fit_transform(X_train)
     X_val_imputed = imputer.transform(X_val)
@@ -49,37 +49,37 @@ def prepare_data(train_df, val_df, test_df):
 
     # Check if there are any remaining NaN values
     if np.isnan(X_train_imputed).any():
-        print("Warning: There are still NaN values after imputation in the training set.")
+        # print("Warning: There are still NaN values after imputation in the training set.")
         # Replace any remaining NaNs with 0
         X_train_imputed = np.nan_to_num(X_train_imputed)
 
     if np.isnan(X_val_imputed).any():
-        print("Warning: There are still NaN values after imputation in the validation set.")
+        # print("Warning: There are still NaN values after imputation in the validation set.")
         X_val_imputed = np.nan_to_num(X_val_imputed)
 
     if np.isnan(X_test_imputed).any():
-        print("Warning: There are still NaN values after imputation in the test set.")
+        # print("Warning: There are still NaN values after imputation in the test set.")
         X_test_imputed = np.nan_to_num(X_test_imputed)
 
     # Scale features (important for KNN)
-    print("Scaling features...")
+    # print("Scaling features...")
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train_imputed)
     X_val_scaled = scaler.transform(X_val_imputed)
     X_test_scaled = scaler.transform(X_test_imputed)
 
     # Final check for any NaN values
-    print("Checking for any remaining NaN values...")
+    # print("Checking for any remaining NaN values...")
     if np.isnan(X_train_scaled).any():
-        print("Warning: NaN values found in scaled training data. Replacing with zeros.")
+        # print("Warning: NaN values found in scaled training data. Replacing with zeros.")
         X_train_scaled = np.nan_to_num(X_train_scaled)
 
     if np.isnan(X_val_scaled).any():
-        print("Warning: NaN values found in scaled validation data. Replacing with zeros.")
+        # print("Warning: NaN values found in scaled validation data. Replacing with zeros.")
         X_val_scaled = np.nan_to_num(X_val_scaled)
 
     if np.isnan(X_test_scaled).any():
-        print("Warning: NaN values found in scaled test data. Replacing with zeros.")
+        # print("Warning: NaN values found in scaled test data. Replacing with zeros.")
         X_test_scaled = np.nan_to_num(X_test_scaled)
 
     print("Data preparation complete.")
@@ -93,7 +93,7 @@ def find_best_k(X_train, y_train, X_val, y_val, k_range=range(1, 21), skip=False
     print("Finding optimal K value...")
 
     if skip:
-        print("Skip Find best k process and use previous best k")
+        print("use previous best_k = 3")
         best_k = 3
         return best_k
 

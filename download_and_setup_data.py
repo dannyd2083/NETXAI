@@ -55,9 +55,11 @@ def main():
     ctu13_url = "https://mcfp.felk.cvut.cz/publicDatasets/CTU-13-Dataset/CTU-13-Dataset.tar.bz2"
     ctu13_tar_path = "datasets/ctu13.tar.bz2"
     ctu13_extract_path = "datasets/ctu13"
-
-    download_file(ctu13_url, ctu13_tar_path)
-    extract_tar_bz2(ctu13_tar_path, ctu13_extract_path)
+    if os.path.exists(ctu13_extract_path):
+        print("File already exists at {}, skipping download.".format(ctu13_extract_path))
+    else:
+        download_file(ctu13_url, ctu13_tar_path)
+        extract_tar_bz2(ctu13_tar_path, ctu13_extract_path)
 
     # === Step 2: Clone CICFlowMeter-based feature dataset from GitHub ===
     github_repo_url = "https://github.com/imfaisalmalik/CTU13-CSV-Dataset"
