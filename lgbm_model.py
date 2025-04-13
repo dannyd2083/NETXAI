@@ -25,7 +25,7 @@ def train_model(train_csv, val_csv, test_csv):
     best_model = lgb.LGBMClassifier(
         learning_rate=0.1,
         max_depth=-1,
-        min_child_samples=10,
+        min_child_samples=20,
         n_estimators=300,
         subsample=0.6,
         random_state=42
