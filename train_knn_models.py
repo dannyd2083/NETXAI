@@ -2,12 +2,13 @@ import pandas as pd
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, matthews_corrcoef
 from sklearn.impute import SimpleImputer
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import time
+from result_utils import save_results_to_csv
 
 
 def load_datasets(train_csv, val_csv, test_csv):
@@ -85,11 +86,17 @@ def prepare_data(train_df, val_df, test_df):
     return X_train_scaled, y_train, X_val_scaled, y_val, X_test_scaled, y_test
 
 
-def find_best_k(X_train, y_train, X_val, y_val, k_range=range(1, 21)):
+def find_best_k(X_train, y_train, X_val, y_val, k_range=range(1, 21), skip=False):
     """
     Find the optimal K value using validation set
     """
     print("Finding optimal K value...")
+
+    if skip:
+        print("Skip Find best k process and use previous best k")
+        best_k = 3
+        return best_k
+
     k_scores = []
 
     for k in k_range:
@@ -142,7 +149,7 @@ def train_knn_model(X_train, y_train, k):
     return knn
 
 
-def evaluate_model(model, X_test, y_test):
+def evaluate_model(model, X_test, y_test, feature_set_name):
     """
     Evaluate model performance on test set
     """
@@ -156,16 +163,17 @@ def evaluate_model(model, X_test, y_test):
 
     # Calculate metrics
     acc = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
+    prec = precision_score(y_test, y_pred)
+    rec = recall_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
+    mcc = matthews_corrcoef(y_test, y_pred)
 
-    print(f"Prediction completed in {prediction_time:.2f} seconds")
-    print("\nEvaluation on Test Set:")
+    print("Evaluation on Test Set:")
     print(f"Accuracy : {acc:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall   : {recall:.4f}")
+    print(f"Precision: {prec:.4f}")
+    print(f"Recall   : {rec:.4f}")
     print(f"F1 Score : {f1:.4f}")
+    print(f"MCC      : {mcc:.4f}")
 
     # Generate confusion matrix
     cm = confusion_matrix(y_test, y_pred)
@@ -181,19 +189,25 @@ def evaluate_model(model, X_test, y_test):
     plt.savefig("results/knn_confusion_matrix.png")
 
     # Save metrics to CSV
-    metrics_df = pd.DataFrame({
-        'Metric': ['Accuracy', 'Precision', 'Recall', 'F1 Score'],
-        'Value': [acc, precision, recall, f1]
-    })
-    metrics_df.to_csv("results/knn_metrics.csv", index=False)
+    result_dir = os.path.join("results", feature_set_name)
+    result_csv = os.path.join(result_dir, "knn_results.csv")
+    save_results_to_csv(
+        results_dict={feature_set_name: [acc, prec, rec, f1, mcc]},
+        metric_names=["Accuracy", "Precision", "Recall", "F1-score", "MCC"],
+        save_path=result_csv
+    )
 
-    return acc, precision, recall, f1
+    return acc, prec, rec, f1, mcc
 
 
-def analyze_feature_importance(model, X_train, y_train, feature_names):
+def analyze_feature_importance(model, X_train, y_train, feature_names, skip=False):
     """
     Analyze feature importance for KNN by removing features one by one
     """
+    if skip:
+        print("Skip analyze feature importance because it consumes a lot of time.")
+        return
+
     print("\nAnalyzing feature importance...")
 
     # Initialize baseline model
@@ -244,37 +258,37 @@ def analyze_feature_importance(model, X_train, y_train, feature_names):
     return importance_df
 
 
-def main():
+def main(feature_set_name="basic"):
     """
     Main function to train and evaluate KNN model
     """
+    print("--------- Training KNN on {} feature set -----------".format(feature_set_name))
     # Create results directory
     os.makedirs("results", exist_ok=True)
-
+    base_path = os.path.join("data_splits", feature_set_name)
     # Load datasets
     train_df, val_df, test_df = load_datasets(
-        "Datasets/train_set.csv",
-        "Datasets/val_set.csv",
-        "Datasets/test_set.csv"
+        os.path.join(base_path, "train.csv"),
+        os.path.join(base_path, "val.csv"),
+        os.path.join(base_path, "test.csv")
     )
-
     # Prepare data with handling for missing values
     X_train, y_train, X_val, y_val, X_test, y_test = prepare_data(train_df, val_df, test_df)
 
     # Find optimal K value
-    best_k = find_best_k(X_train, y_train, X_val, y_val)
+    best_k = find_best_k(X_train, y_train, X_val, y_val, skip=True)
 
     # Train KNN model
     knn_model = train_knn_model(X_train, y_train, best_k)
 
     # Evaluate model
-    acc, precision, recall, f1 = evaluate_model(knn_model, X_test, y_test)
+    acc, precision, recall, f1, mcc = evaluate_model(knn_model, X_test, y_test, feature_set_name)
 
     # Get feature names (column names without the Label column)
     feature_names = train_df.drop(columns=["Label"]).columns.tolist()
 
     # Analyze feature importance
-    analyze_feature_importance(knn_model, X_train, y_train, feature_names)
+    analyze_feature_importance(knn_model, X_train, y_train, feature_names, skip=True)
 
     print("\nKNN model training and evaluation completed!")
     return knn_model
@@ -282,3 +296,4 @@ def main():
 
 if __name__ == "__main__":
     model = main()
+    main(feature_set_name="cicflowmeter")

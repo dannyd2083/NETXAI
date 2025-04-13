@@ -1,13 +1,13 @@
+## To find the best params for logistic regression model
+## For the same data only run once, because it takes a long time
+
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
-import matplotlib.pyplot as plt
-import seaborn as sns
 import os
-import time
+
 
 
 def load_datasets(train_csv, val_csv, test_csv):
@@ -148,160 +148,19 @@ def optimize_parameters(X_train, y_train, X_val, y_val):
     return best_params
 
 
-def train_logistic_regression(X_train, y_train, params):
-    """
-    Train Logistic Regression model with optimal parameters
-    """
-    print(f"Training Logistic Regression model with parameters: {params}")
-    start_time = time.time()
-
-    lr = LogisticRegression(**params, random_state=42)
-    lr.fit(X_train, y_train)
-
-    training_time = time.time() - start_time
-    print(f"Model training completed in {training_time:.2f} seconds")
-
-    return lr
-
-
-def evaluate_model(model, X_test, y_test):
-    """
-    Evaluate model performance on test set
-    """
-    print("Evaluating model on test set...")
-    start_time = time.time()
-
-    # Predict on test set
-    y_pred = model.predict(X_test)
-
-    prediction_time = time.time() - start_time
-
-    # Calculate metrics
-    acc = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
-
-    print(f"Prediction completed in {prediction_time:.2f} seconds")
-    print("\nEvaluation on Test Set:")
-    print(f"Accuracy : {acc:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall   : {recall:.4f}")
-    print(f"F1 Score : {f1:.4f}")
-
-    # Generate confusion matrix
-    cm = confusion_matrix(y_test, y_pred)
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
-                xticklabels=['Normal', 'Malicious'],
-                yticklabels=['Normal', 'Malicious'])
-    plt.title('Confusion Matrix')
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
-
-    # Ensure results directory exists
-    os.makedirs("results", exist_ok=True)
-
-    # Save confusion matrix
-    plt.savefig("results/logistic_regression_confusion_matrix.png")
-
-    # Save metrics to CSV
-    metrics_df = pd.DataFrame({
-        'Metric': ['Accuracy', 'Precision', 'Recall', 'F1 Score'],
-        'Value': [acc, precision, recall, f1]
-    })
-    metrics_df.to_csv("results/logistic_regression_metrics.csv", index=False)
-
-    return acc, precision, recall, f1
-
-
-def analyze_feature_importance(model, feature_names):
-    """
-    Analyze feature importance based on model coefficients
-    """
-    print("\nAnalyzing feature importance...")
-
-    # Get coefficients
-    coefficients = model.coef_[0]
-
-    # Create DataFrame for feature importance
-    importance_df = pd.DataFrame({
-        'Feature': feature_names,
-        'Coefficient': coefficients,
-        'Absolute_Importance': np.abs(coefficients)
-    })
-
-    # Sort by absolute importance
-    importance_df = importance_df.sort_values('Absolute_Importance', ascending=False)
-
-    # Plot feature importance (top 20 features)
-    plt.figure(figsize=(12, 10))
-    top_features = importance_df.head(20)
-    colors = ['red' if c < 0 else 'blue' for c in top_features['Coefficient']]
-
-    bars = plt.barh(top_features['Feature'], top_features['Absolute_Importance'], color=colors)
-    plt.title('Top 20 Feature Importance for Logistic Regression Model')
-    plt.xlabel('Absolute Coefficient Value')
-    plt.tight_layout()
-    plt.savefig("results/logistic_regression_feature_importance.png")
-
-    # Save feature importance to CSV
-    importance_df.to_csv("results/logistic_regression_feature_importance.csv", index=False)
-
-    print("Top 10 most important features:")
-    for i, row in importance_df.head(10).iterrows():
-        print(f"  {row['Feature']}: {row['Coefficient']:.4f}")
-
-    return importance_df
-
-
-def visualize_decision_boundary(model, X_test, y_test):
-    """
-    Create a simple visualization of the decision boundary
-    using dimensionality reduction to 2D
-    """
-    try:
-        from sklearn.decomposition import PCA
-
-        print("\nVisualizing decision boundary...")
-
-        # Reduce dimensionality to 2D for visualization
-        pca = PCA(n_components=2)
-        X_pca = pca.fit_transform(X_test)
-
-        # Get decision function values (distance from decision boundary)
-        decision_values = model.decision_function(X_test)
-
-        # Create plot
-        plt.figure(figsize=(10, 8))
-        sc = plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y_test,
-                         cmap=plt.cm.coolwarm, alpha=0.8,
-                         edgecolors='k', s=40)
-
-        plt.colorbar(sc, label='Class')
-        plt.title('PCA Projection with Decision Boundary')
-        plt.xlabel('Principal Component 1')
-        plt.ylabel('Principal Component 2')
-
-        # Save visualization
-        plt.savefig("results/logistic_regression_decision_boundary.png")
-
-    except Exception as e:
-        print(f"Could not create decision boundary visualization: {str(e)}")
-
-
-def main():
+def main(feature_set_name="basic"):
     """
     Main function to train and evaluate Logistic Regression model
     """
+    print("--------- Training Logistic Regression on {} feature set -----------".format(feature_set_name))
     # Create results directory
     os.makedirs("results", exist_ok=True)
-
+    base_path = os.path.join("data_splits", feature_set_name)
     # Load datasets
     train_df, val_df, test_df = load_datasets(
-        "Datasets/train_set.csv",
-        "Datasets/val_set.csv",
-        "Datasets/test_set.csv"
+        os.path.join(base_path, "train.csv"),
+        os.path.join(base_path, "val.csv"),
+        os.path.join(base_path, "test.csv")
     )
 
     # Prepare data with handling for missing values
@@ -309,22 +168,4 @@ def main():
 
     # Optimize parameters
     best_params = optimize_parameters(X_train, y_train, X_val, y_val)
-
-    # Train model
-    lr_model = train_logistic_regression(X_train, y_train, best_params)
-
-    # Evaluate model
-    acc, precision, recall, f1 = evaluate_model(lr_model, X_test, y_test)
-
-    # Analyze feature importance
-    analyze_feature_importance(lr_model, feature_names)
-
-    # Visualize decision boundary
-    visualize_decision_boundary(lr_model, X_test, y_test)
-
-    print("\nLogistic Regression model training and evaluation completed!")
-    return lr_model
-
-
-if __name__ == "__main__":
-    model = main()
+    return best_params
