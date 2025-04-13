@@ -4,12 +4,12 @@ __pycache__/
 .idea
 *.py[cod]
 *$py.class
-Classified_CSVs
-CTU*
-Processed_CSVs
-Datasets*
+
+# Datasets
+data_splits*
 features*
-.DS_Storeg
+datasets*
+
 
 # C extensions
 *.so
