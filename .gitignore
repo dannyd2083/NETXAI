@@ -7,7 +7,7 @@ Classified_CSVs
 CTU*
 Processed_CSVs
 Datasets*
-Feature_CSVs
+features*
 .DS_Store
 
 # C extensions
