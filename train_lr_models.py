@@ -3,11 +3,12 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, matthews_corrcoef
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import time
+from result_utils import save_results_to_csv
 
 
 def load_datasets(train_csv, val_csv, test_csv):
@@ -164,7 +165,7 @@ def train_logistic_regression(X_train, y_train, params):
     return lr
 
 
-def evaluate_model(model, X_test, y_test):
+def evaluate_model(model, X_test, y_test, feature_set_name):
     """
     Evaluate model performance on test set
     """
@@ -178,16 +179,17 @@ def evaluate_model(model, X_test, y_test):
 
     # Calculate metrics
     acc = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
+    prec = precision_score(y_test, y_pred)
+    rec = recall_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
+    mcc = matthews_corrcoef(y_test, y_pred)
 
-    print(f"Prediction completed in {prediction_time:.2f} seconds")
-    print("\nEvaluation on Test Set:")
+    print("Evaluation on Test Set:")
     print(f"Accuracy : {acc:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall   : {recall:.4f}")
+    print(f"Precision: {prec:.4f}")
+    print(f"Recall   : {rec:.4f}")
     print(f"F1 Score : {f1:.4f}")
+    print(f"MCC      : {mcc:.4f}")
 
     # Generate confusion matrix
     cm = confusion_matrix(y_test, y_pred)
@@ -206,13 +208,15 @@ def evaluate_model(model, X_test, y_test):
     plt.savefig("results/logistic_regression_confusion_matrix.png")
 
     # Save metrics to CSV
-    metrics_df = pd.DataFrame({
-        'Metric': ['Accuracy', 'Precision', 'Recall', 'F1 Score'],
-        'Value': [acc, precision, recall, f1]
-    })
-    metrics_df.to_csv("results/logistic_regression_metrics.csv", index=False)
+    result_dir = os.path.join("results", feature_set_name)
+    result_csv = os.path.join(result_dir, "lr_results.csv")
+    save_results_to_csv(
+        results_dict={feature_set_name: [acc, prec, rec, f1, mcc]},
+        metric_names=["Accuracy", "Precision", "Recall", "F1-score", "MCC"],
+        save_path=result_csv
+    )
 
-    return acc, precision, recall, f1
+    return acc, prec, rec, f1, mcc
 
 
 def analyze_feature_importance(model, feature_names):
@@ -290,41 +294,44 @@ def visualize_decision_boundary(model, X_test, y_test):
         print(f"Could not create decision boundary visualization: {str(e)}")
 
 
-def main():
+def main(feature_set_name="basic"):
     """
     Main function to train and evaluate Logistic Regression model
     """
+    print("--------- Training Logistic Regression on {} feature set -----------".format(feature_set_name))
     # Create results directory
     os.makedirs("results", exist_ok=True)
-
+    base_path = os.path.join("data_splits", feature_set_name)
     # Load datasets
     train_df, val_df, test_df = load_datasets(
-        "Datasets/train_set.csv",
-        "Datasets/val_set.csv",
-        "Datasets/test_set.csv"
+        os.path.join(base_path, "train.csv"),
+        os.path.join(base_path, "val.csv"),
+        os.path.join(base_path, "test.csv")
     )
 
     # Prepare data with handling for missing values
     X_train, y_train, X_val, y_val, X_test, y_test, feature_names = prepare_data(train_df, val_df, test_df)
 
-    # Optimize parameters
-    best_params = optimize_parameters(X_train, y_train, X_val, y_val)
+    # # Optimize parameters -- Only run once!!!
+    # best_params = optimize_parameters(X_train, y_train, X_val, y_val)
+    best_params = {'C': 1.0, 'penalty': 'l2', 'solver': 'lbfgs', 'max_iter': 1000}
 
     # Train model
     lr_model = train_logistic_regression(X_train, y_train, best_params)
 
     # Evaluate model
-    acc, precision, recall, f1 = evaluate_model(lr_model, X_test, y_test)
+    acc, precision, recall, f1, mcc = evaluate_model(lr_model, X_test, y_test, feature_set_name)
 
-    # Analyze feature importance
-    analyze_feature_importance(lr_model, feature_names)
+    # # Analyze feature importance
+    # analyze_feature_importance(lr_model, feature_names)
 
-    # Visualize decision boundary
-    visualize_decision_boundary(lr_model, X_test, y_test)
+    # # Visualize decision boundary
+    # visualize_decision_boundary(lr_model, X_test, y_test)
 
     print("\nLogistic Regression model training and evaluation completed!")
     return lr_model
 
 
 if __name__ == "__main__":
-    model = main()
+    main()
+    main(feature_set_name="cicflowmeter")
