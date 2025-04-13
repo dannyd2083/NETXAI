@@ -8,9 +8,17 @@ def load_results_from_folder(folder_path):
     Load all results from a given results folder
     Return model names and corresponding score matrix
     """
+    if not os.path.isdir(folder_path):
+        print(f"[Warning] Folder not found: {folder_path}")
+        return [], [], []
     result_files = sorted([f for f in os.listdir(folder_path) if f.endswith("_results.csv")])
+    if not result_files:
+        print(f"[Warning] No result files found in {folder_path}")
+        return [], [], []
     data = []
     model_names = []
+
+
 
     for file in result_files:
         df = pd.read_csv(os.path.join(folder_path, file), index_col=0)

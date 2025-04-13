@@ -7,9 +7,14 @@ import os
 from result_utils import save_results_to_csv
 import time
 
-def train_model(train_csv, val_csv, test_csv, feature_set_name="basic"):
+def train_model(feature_set_name="basic"):
     start_time = time.time()
     # Load datasets
+    base_path = os.path.join("data_splits", feature_set_name)
+    train_csv = os.path.join(base_path, "train.csv")
+    val_csv = os.path.join(base_path, "val.csv")
+    test_csv = os.path.join(base_path, "test.csv")
+
     train_df = pd.read_csv(train_csv)
     val_df = pd.read_csv(val_csv)
     test_df = pd.read_csv(test_csv)
@@ -70,10 +75,15 @@ def train_model(train_csv, val_csv, test_csv, feature_set_name="basic"):
 
     return best_model
 
-# Execute model training with LightGBM
-# Execute model training
-model = train_model("data_splits/basic/train.csv", "data_splits/basic/val.csv", "data_splits/basic/test.csv", feature_set_name="basic")
-model = train_model("data_splits/cicflowmeter/train.csv", "data_splits/cicflowmeter/val.csv", "data_splits/cicflowmeter/test.csv", feature_set_name="cicflowmeter")
+
+
+def main(feature_set_name="basic"):
+
+    # Execute model training with LightGBM
+    # Execute model training
+    train_model(feature_set_name)
+
+
 
 # Evaluation on Test Set:
 # Accuracy : 0.9625
@@ -82,3 +92,6 @@ model = train_model("data_splits/cicflowmeter/train.csv", "data_splits/cicflowme
 # F1 Score : 0.9664
 # Matthews Correlation Coefficient: 0.9241
 # Test Error: 0.0375
+
+if __name__ == "__main__":
+    main()

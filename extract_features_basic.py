@@ -54,13 +54,10 @@ def extract_basic_features(input_csv, output_csv, add_features):
     df[feature_columns].to_csv(output_csv, index=False)
     print(f"Features saved to {output_csv}")
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Extract 9-basic features from labeled traffic CSVs.")
-    parser.add_argument("--sport", action="store_true", help="Include Sport feature with one-hot encoding")
-    args = parser.parse_args()
 
+def main(sport = False):
     extra_features = []
-    if args.sport:
+    if sport:
         extra_features.append("Sport")
 
     input_dir = "datasets/ctu13/classified_binetflow"
@@ -82,4 +79,10 @@ if __name__ == "__main__":
         if os.path.isfile(fpath):
             df = pd.read_csv(fpath)
             print(f"{label.capitalize()} features: {len(df)} samples")
+
+
+if __name__ == "__main__":
+    main()
+
+
 

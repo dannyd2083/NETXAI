@@ -61,7 +61,11 @@ def count_traffic_rows(classified_dir="datasets/ctu13/classified_binetflow"):
             df = pd.read_csv(path)
             print("{} {} traffic rows in total.".format(len(df), label))
 
-if __name__ == "__main__":
+def main():
     process_binetflow_to_csv()
     classify_traffic()
     count_traffic_rows()
+
+
+if __name__ == "__main__":
+    main()

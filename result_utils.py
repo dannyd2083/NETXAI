@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-from radar_plot import make_radar_chart
 
 
 def save_results_to_csv(results_dict, metric_names, save_path):

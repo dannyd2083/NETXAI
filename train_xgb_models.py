@@ -94,16 +94,14 @@ def process_feature_set(feature_set_name, output_dir):
 
 
 
-def main():
-    print("Training XGBoost on each feature set...\n")
+def main(feature_set_name="basic"):
+    print("Training XGBoost on  feature set {}...\n".format(feature_set_name))
 
-    feature_sets = ["basic", "cicflowmeter"]
-    for fs in feature_sets:
-        start_time = time.time()
-        output_dir = os.path.join("results", fs)
-        process_feature_set(fs, output_dir)
-        end_time = time.time()
-        print("XGBoost Model Takes {} seconds.".format(end_time-start_time))
+    start_time = time.time()
+    output_dir = os.path.join("results", feature_set_name)
+    process_feature_set(feature_set_name, output_dir)
+    end_time = time.time()
+    print("XGBoost Model Takes {} seconds.".format(end_time-start_time))
 
 if __name__ == "__main__":
     main()

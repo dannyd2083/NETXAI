@@ -42,7 +42,8 @@ def split_and_save(malicious_csv, normal_csv, output_dir):
     print("  Test set: {} samples (Malicious: {}, Normal: {})".format(len(test_df), len(mal_test), len(normal_test)))
     print("--------------------------------------------------")
 
-if __name__ == "__main__":
+
+def main():
     print("-------- Splitting feature set: basic --------")
     split_and_save(
         "features/basic/basic_malicious.csv",
@@ -56,3 +57,8 @@ if __name__ == "__main__":
         "features/cicflowmeter/cic_normal.csv",
         "data_splits/cicflowmeter"
     )
+
+
+
+if __name__ == "__main__":
+    main()

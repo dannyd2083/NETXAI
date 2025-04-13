@@ -49,21 +49,23 @@ def extract_tar_bz2(tar_path, extract_to):
     print("Extraction complete.")
 
 
-# === Step 1: Download and extract CTU-13 raw dataset ===
-ctu13_url = "https://mcfp.felk.cvut.cz/publicDatasets/CTU-13-Dataset/CTU-13-Dataset.tar.bz2"
-ctu13_tar_path = "datasets/ctu13.tar.bz2"
-ctu13_extract_path = "datasets/ctu13"
+def main():
 
-download_file(ctu13_url, ctu13_tar_path)
-extract_tar_bz2(ctu13_tar_path, ctu13_extract_path)
+    # === Step 1: Download and extract CTU-13 raw dataset ===
+    ctu13_url = "https://mcfp.felk.cvut.cz/publicDatasets/CTU-13-Dataset/CTU-13-Dataset.tar.bz2"
+    ctu13_tar_path = "datasets/ctu13.tar.bz2"
+    ctu13_extract_path = "datasets/ctu13"
 
-# === Step 2: Clone CICFlowMeter-based feature dataset from GitHub ===
-github_repo_url = "https://github.com/imfaisalmalik/CTU13-CSV-Dataset"
-github_clone_path = "datasets/CTU13-CSV-Dataset"
+    download_file(ctu13_url, ctu13_tar_path)
+    extract_tar_bz2(ctu13_tar_path, ctu13_extract_path)
 
-if not os.path.exists(github_clone_path):
-    print("Cloning {} ...".format(github_repo_url))
-    subprocess.run(["git", "clone", github_repo_url, github_clone_path])
-    print("Cloning complete.")
-else:
-    print("{} already exists, skipping clone.".format(github_clone_path))
+    # === Step 2: Clone CICFlowMeter-based feature dataset from GitHub ===
+    github_repo_url = "https://github.com/imfaisalmalik/CTU13-CSV-Dataset"
+    github_clone_path = "datasets/CTU13-CSV-Dataset"
+
+    if not os.path.exists(github_clone_path):
+        print("Cloning {} ...".format(github_repo_url))
+        subprocess.run(["git", "clone", github_repo_url, github_clone_path])
+        print("Cloning complete.")
+    else:
+        print("{} already exists, skipping clone.".format(github_clone_path))

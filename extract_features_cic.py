@@ -2,7 +2,7 @@ import os
 import shutil
 import pandas as pd
 
-def organize_cicflow_features(input_dir="datasets/CTU13-CSV-Dataset", output_dir="features/cicflowmeter"):
+def main(input_dir="datasets/CTU13-CSV-Dataset", output_dir="features/cicflowmeter"):
     os.makedirs(output_dir, exist_ok=True)
 
     input_attack = os.path.join(input_dir, "CTU13_Attack_Traffic.csv")
@@ -31,4 +31,4 @@ def organize_cicflow_features(input_dir="datasets/CTU13-CSV-Dataset", output_dir
             print("{} CIC features: {} samples".format(label.capitalize(), len(df)))
 
 if __name__ == "__main__":
-    organize_cicflow_features()
+    main()
