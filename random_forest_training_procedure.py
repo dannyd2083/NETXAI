@@ -78,9 +78,9 @@ def find_best_param(train_csv, val_csv, test_csv, param_name, param_values, fixe
     return best_val, results
 
 best_max_features, max_feat_results = find_best_param(
-    train_csv="Datasets/train_set.csv",
-    val_csv="Datasets/val_set.csv",
-    test_csv="Datasets/test_set.csv",
+    train_csv="data_splits/basic/train.csv",
+    val_csv="data_splits/basic/val.csv",
+    test_csv="data_splits/basic/test.csv",
     param_name="max_features",
     param_values=['sqrt', 'log2', None, 2, 4, 6, 8, 10],
     fixed_params={},  # No other fixed params yet
@@ -88,9 +88,9 @@ best_max_features, max_feat_results = find_best_param(
 )
 
 best_n_estimators, n_est_results = find_best_param(
-    train_csv="Datasets/train_set.csv",
-    val_csv="Datasets/val_set.csv",
-    test_csv="Datasets/test_set.csv",
+    train_csv="data_splits/basic/train.csv",
+    val_csv="data_splits/basic/val.csv",
+    test_csv="data_splits/basic/test.csv",
     param_name="n_estimators",
     param_values=[10, 50, 100, 150, 200],
     fixed_params={"max_features": best_max_features},
@@ -98,9 +98,9 @@ best_n_estimators, n_est_results = find_best_param(
 )
 
 best_max_depth, max_depth_results = find_best_param(
-    train_csv="Datasets/train_set.csv",
-    val_csv="Datasets/val_set.csv",
-    test_csv="Datasets/test_set.csv",
+    train_csv="data_splits/basic/train.csv",
+    val_csv="data_splits/basic/val.csv",
+    test_csv="data_splits/basic/test.csv",
     param_name="max_depth",
     param_values=[None, 2, 5, 10, 20, 30],
     fixed_params={

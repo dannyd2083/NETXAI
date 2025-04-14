@@ -6,8 +6,17 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import f1_score, accuracy_score
 import lightgbm as lgb
 from itertools import product
+import argparse
+import os
 
-def load_data(train_csv, val_csv, test_csv, label_col='Label', verbose=True):
+
+def load_data(feature_set,label_col='Label', verbose=False):
+    # Load datasets
+    base_path = os.path.join("data_splits", feature_set)
+    train_csv = os.path.join(base_path, "train.csv")
+    val_csv = os.path.join(base_path, "val.csv")
+    test_csv = os.path.join(base_path, "test.csv")
+
     train_df = pd.read_csv(train_csv)
     val_df = pd.read_csv(val_csv)
     test_df = pd.read_csv(test_csv)
@@ -61,13 +70,9 @@ def evaluate_grid_with_cv(X, y, param_grid, n_splits=5, random_state=42):
     print(f"Best Avg F1 Error: {best_error:.4f}")
     return best_params, results
 
-if __name__ == "__main__":
-    # Load all datasets
-    X_train, y_train, _, _, X_test, y_test = load_data(
-        "Datasets/train_set.csv",
-        "Datasets/val_set.csv",
-        "Datasets/test_set.csv"
-    )
+def main(feature_set="basic"):
+        # Load all datasets
+    X_train, y_train, _, _, X_test, y_test = load_data(feature_set)
 
     # Define grid
     param_grid = {
@@ -92,6 +97,14 @@ if __name__ == "__main__":
     print(f"\n Test Set Evaluation:")
     print(f"F1 Score: {test_f1:.4f}")
 
+if __name__ == "__main__":
+
 # Best Params: {'n_estimators': 300, 'max_depth': -1, 'learning_rate': 0.1, 'min_child_samples': 20, 'subsample': 0.6}
 # Best Avg F1 Error: 0.0337
+
+    parser = argparse.ArgumentParser(description="Train model with specified feature set")
+    parser.add_argument("--feature_set", choices=["basic", "cicflowmeter"], default="basic",
+                        help="Specify feature set to use (default: basic)")
+    args = parser.parse_args()
+    main(args.feature_set)
 
