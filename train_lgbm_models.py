@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import os
 from result_utils import save_results_to_csv
 import time
+import argparse
 
 def train_model(feature_set_name="basic"):
     start_time = time.time()
@@ -94,4 +95,8 @@ def main(feature_set_name="basic"):
 # Test Error: 0.0375
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Train model with specified feature set")
+    parser.add_argument("--feature_set", choices=["basic", "cicflowmeter"], default="basic",
+                        help="Specify feature set to use (default: basic)")
+    args = parser.parse_args()
+    main(args.feature_set)

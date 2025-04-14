@@ -9,6 +9,7 @@ from sklearn.metrics import (
 from result_utils import save_results_to_csv
 from shap_utils import generate_and_save_shap_plots
 import time
+import argparse
 
 
 def load_split_data(split_dir):
@@ -103,5 +104,10 @@ def main(feature_set_name="basic"):
     end_time = time.time()
     print("XGBoost Model Takes {} seconds.".format(end_time-start_time))
 
+
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Train model with specified feature set")
+    parser.add_argument("--feature_set", choices=["basic", "cicflowmeter"], default="basic",
+                        help="Specify feature set to use (default: basic)")
+    args = parser.parse_args()
+    main(args.feature_set)
