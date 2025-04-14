@@ -34,12 +34,6 @@ conda activate testenv
 `pip install -r requirements.txt`    
 **We recommend using Python 3.12 and a virtual environment.**
 
-### 🔧 System Requirements
-
-If you're using `macOS` and encounter issues with `LightGBM` or `XGBoost`, you may need to install `OpenMP`:
-
-`brew install libomp`
-
 
 ## 📂 3. Dataset Setup
 
@@ -108,9 +102,14 @@ results/
 
 ## ⚠️ Known Issues & Troubleshooting
 
-### 1. ❌ XGBoost Error: "You are running 32-bit Python on a 64-bit OS"
-✅ Solution: install via conda (recommended):
+### 1. ❌ XGBoost Error: "You are running 32-bit Python on a 64-bit OS", or encounter issues with `LightGBM` or `XGBoost`   
+✅ Solution 1: install via conda (recommended):
 `conda install -c conda-forge xgboost`
+
+✅ Solution 2:
+If you're using `macOS`, you may need to install `OpenMP`:
+
+`brew install libomp`
 
 
 
