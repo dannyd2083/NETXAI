@@ -76,7 +76,7 @@ and extracting the dataset into the following path:
 ## ⚠️ Known Issues & Troubleshooting
 
 ### 1. ❌ XGBoost Error: "You are running 32-bit Python on a 64-bit OS", or encounter issues with `LightGBM` or `XGBoost`   
-✅ Solution 1: install via conda (recommended):
+✅ Solution 1: install via conda (recommended):   
 `conda install -c conda-forge xgboost`
 
 ✅ Solution 2:
@@ -99,8 +99,8 @@ Options:
 
 ### 📌 Example Usages
 
-✅ Run the full pipeline with all models on `basic` features:
-`python main.py --feature_set basic`
+✅ Run the full pipeline with all models on `basic` features:   
+`python main.py`
 
 ✅ Run the full pipeline with all models on `CICFlowMeter` features:
 
