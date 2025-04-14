@@ -37,13 +37,14 @@ conda activate testenv
 
 ## 📂 3. Dataset Setup
 
-**⚠️⚠️⚠️⚠️⚠️⚠️The CTU-13 dataset is very large  and takes a long time to download.**
-To avoid waiting, we recommend manually downloading from:   
+**⚠️⚠️⚠️⚠️⚠️⚠️The CTU-13 dataset is very large  and takes a long time to download and extract.**
+
+* To avoid waiting, we recommend manually downloading from:   
 https://mcfp.felk.cvut.cz/publicDatasets/CTU-13-Dataset/   
 and extracting the dataset into the following path:   
 `datasets/ctu13/`
-* If not already downloaded, the following script(you don't need to run it) will attempt to download via script (⚠️ slow):
-`download_and_setup_data.py`
+
+* If you do not want to download it manually, the script will download and extract it automatically, refer to the "Usage" part.
 
 
 
@@ -87,7 +88,8 @@ If you're using `macOS`, you may need to install `OpenMP`:
 
 
 ## 🚀 Usage
-### Note: To save time, we skip the hyperparameter search phase and directly use the best parameters previously identified through cross-validation. If you're interested in the tuning process, please refer to `lgbm_model_training_procedure.py`, `logistic_regression_training_procedure.py` and `random_forest_training_procedure.py`.
+### Note: To save time, we skip the hyperparameter search phase and directly use the best parameters previously identified through cross-validation. If you're interested in the tuning process, please refer to `lgbm_model_training_procedure.py`, `logistic_regression_training_procedure.py` and `random_forest_training_procedure.py`.   
+
 You can run the full pipeline with:   
 `python main.py --feature_set <feature set> --model <model name>`   
 
@@ -99,12 +101,13 @@ Options:
 
 ### 📌 Example Usages
 
-✅ Run the full pipeline with all models on `basic` features:   
-`python main.py`
-
-✅ Run the full pipeline with all models on `CICFlowMeter` features:
+✅ **Quick Start**: Run the full pipeline using all models on `CICFlowMeter` features to quickly test the entire process without having to download the large CTU-13 dataset.
 
 `python main.py --feature_set cicflowmeter`
+
+✅ Run the full pipeline with all models on `basic` features. Note: these features are extracted from the original CTU-13 dataset, which may take a long time to download and process.   
+`python main.py`
+
 
 ✅ Run with selected models only (e.g., `XGBoost`) on basic features:   
 

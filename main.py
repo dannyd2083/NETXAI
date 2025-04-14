@@ -27,12 +27,12 @@ def main():
     print("\n Running pipeline for: {} feature set".format(feature_set))
 
     print("\n Step 1: Downloading datasets... (It may take a while)")
-    download_and_setup_data.main()
-
-    print("\n Step 2: Processing raw .binetflow files...")
-    process_raw_binetflow.main()
+    download_and_setup_data.main(feature_set)
 
     if feature_set == "basic":
+        print("\n Step 2: Processing raw .binetflow files...")
+        process_raw_binetflow.main()
+        
         print("\n Step 3: Extracting basic features...")
         extract_features_basic.main()
     else:
