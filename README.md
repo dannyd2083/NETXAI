@@ -155,3 +155,9 @@ python train_lgbm_models.py
 python train_knn_models.py --feature_set cicflowmeter
 python train_lr_models.py
 ```
+
+## 📊 Results Summary
+
+Below are the evaluation results (Accuracy, Precision, Recall, F1-score, MCC) for each model on two different feature sets.
+
+![Results Overview](results/results.jpg)
