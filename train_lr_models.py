@@ -9,6 +9,7 @@ import seaborn as sns
 import os
 import time
 from result_utils import save_results_to_csv
+import argparse
 
 
 def load_datasets(train_csv, val_csv, test_csv):
@@ -338,5 +339,8 @@ def main(feature_set_name="basic"):
 
 
 if __name__ == "__main__":
-    main()
-    main(feature_set_name="cicflowmeter")
+    parser = argparse.ArgumentParser(description="Train model with specified feature set")
+    parser.add_argument("--feature_set", choices=["basic", "cicflowmeter"], default="basic",
+                        help="Specify feature set to use (default: basic)")
+    args = parser.parse_args()
+    main(args.feature_set)
