@@ -3,6 +3,9 @@ This project replicates and extends the paper:
 "Integrating Explainable AI for Effective Malware Detection in Encrypted Network Traffic"
 by evaluating various machine learning models on flow-based network features.
 
+## **Note:** This project was developed and tested on **macOS**.
+
+
 We compare two types of feature sets:
 
 * **CICFlowMeter-generated features**
@@ -18,6 +21,11 @@ Install dependencies via:
 `pip install -r requirements.txt`    
 **We recommend using Python 3.12 and a virtual environment.**
 
+### ## 🔧 System Requirements
+
+If you're using `macOS` and encounter issues with `LightGBM` or `XGBoost`, you may need to install `OpenMP`:
+
+`brew install libomp`
 
 
 ## 📂 3. Dataset Setup
@@ -89,12 +97,8 @@ results/
 
 
 
-
-
-
-
-
 ## 🚀 Usage
+### Note: To save time, we skip the hyperparameter search phase and directly use the best parameters previously identified through cross-validation. If you're interested in the tuning process, please refer to lgbm_model_training_procedure.py, logistic_regression_training_procedure.py and random_forest_training_procedure.py.
 You can run the full pipeline with:   
 `python main.py --feature_set <feature set> --model <model name>`   
 
