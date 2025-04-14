@@ -43,22 +43,23 @@ def split_and_save(malicious_csv, normal_csv, output_dir):
     print("--------------------------------------------------")
 
 
-def main():
-    print("-------- Splitting feature set: basic --------")
-    split_and_save(
-        "features/basic/basic_malicious.csv",
-        "features/basic/basic_normal.csv",
-        "data_splits/basic"
-    )
-
-    print("-------- Splitting feature set --------")
-    split_and_save(
-        "features/cicflowmeter/cic_malicious.csv",
-        "features/cicflowmeter/cic_normal.csv",
-        "data_splits/cicflowmeter"
-    )
+def main(feature_set="basic"):
+    if feature_set == "basic":
+        print("-------- Splitting feature set: basic --------")
+        split_and_save(
+            "features/basic/basic_malicious.csv",
+            "features/basic/basic_normal.csv",
+            "data_splits/basic"
+        )
+    else:
+        print("-------- Splitting feature set --------")
+        split_and_save(
+            "features/cicflowmeter/cic_malicious.csv",
+            "features/cicflowmeter/cic_normal.csv",
+            "data_splits/cicflowmeter"
+        )
 
 
 
 if __name__ == "__main__":
-    main()
+    main(feature_set="basic")

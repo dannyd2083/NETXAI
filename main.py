@@ -40,7 +40,7 @@ def main():
         extract_features_cic.main()
 
     print("\n Step 4: Splitting dataset...")
-    split_dataset.main()
+    split_dataset.main(feature_set)
 
     model_map = {
         "xgb": xgb,
