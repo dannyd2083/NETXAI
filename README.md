@@ -17,7 +17,20 @@ We compare two types of feature sets:
 `cd NETXAI `  
 
 ## 📦 2. Set up the Environment
-Install dependencies via:   
+
+This project was developed and tested in a `macOS` environment using a `conda` virtual environment for dependency isolation and reproducibility.
+
+### 💡 Environment Setup (with Conda)
+
+If you don’t have Conda, install [Anaconda](https://www.anaconda.com/) first.
+
+🔧 Create and activate a new environment:
+```
+conda create -n testenv python=3.12 -y
+conda activate testenv
+```
+
+### 📦 Install dependencies via:   
 `pip install -r requirements.txt`    
 **We recommend using Python 3.12 and a virtual environment.**
 
@@ -93,7 +106,11 @@ results/
 ```
 
 
+## ⚠️ Known Issues & Troubleshooting
 
+### 1. ❌ XGBoost Error: "You are running 32-bit Python on a 64-bit OS"
+✅ Solution: install via conda (recommended):
+`conda install -c conda-forge xgboost`
 
 
 
