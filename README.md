@@ -72,33 +72,6 @@ and extracting the dataset into the following path:
 | `data_splits/` | Store splited dataset: `train/val/test.csv` | 
 
 
-## 📁 `results/` Directory Structure
-```
-results/
-├── basic/                      # results of models trained on 9 basic features
-│   ├── knn_results.csv
-│   ├── lgbm_results.csv
-│   ├── lr_results.csv
-│   ├── rf_results.csv
-│   └── xgb_results.csv
-
-├── cicflowmeter/              # results of models trained on CICFlowMeter features
-│   ├── knn_results.csv
-│   ├── lgbm_results.csv
-│   ├── lr_results.csv
-│   ├── rf_results.csv
-│   └── xgb_results.csv
-
-├── radar/                     # Radar charts comparing model performance
-│   ├── radar_basic.png
-│   └── radar_cicflowmeter.png
-
-├── shap/                      # SHAP plots for model explainability
-│   ├── basic/                 # SHAP plots for basic features (per model)
-│   └── cicflowmeter/         # SHAP plots for CICFlowMeter features (per model)
-
-```
-
 
 ## ⚠️ Known Issues & Troubleshooting
 
@@ -170,6 +143,33 @@ python train_rf_models.py --feature_set cicflowmeter
 python train_lgbm_models.py
 python train_knn_models.py --feature_set cicflowmeter
 python train_lr_models.py
+```
+
+## 📁 `results/` Directory Structure
+```
+results/
+├── basic/                      # results of models trained on 9 basic features
+│   ├── knn_results.csv
+│   ├── lgbm_results.csv
+│   ├── lr_results.csv
+│   ├── rf_results.csv
+│   └── xgb_results.csv
+
+├── cicflowmeter/              # results of models trained on CICFlowMeter features
+│   ├── knn_results.csv
+│   ├── lgbm_results.csv
+│   ├── lr_results.csv
+│   ├── rf_results.csv
+│   └── xgb_results.csv
+
+├── radar/                     # Radar charts comparing model performance
+│   ├── radar_basic.png
+│   └── radar_cicflowmeter.png
+
+├── shap/                      # SHAP plots for model explainability
+│   ├── basic/                 # SHAP plots for basic features (per model)
+│   └── cicflowmeter/         # SHAP plots for CICFlowMeter features (per model)
+
 ```
 
 ## 📊 Results Summary
