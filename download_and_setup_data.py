@@ -35,8 +35,11 @@ def extract_tar_bz2(tar_path, extract_to):
         print("{} already exists and is not empty, skipping extraction.".format(extract_to))
         return
     print("Extracting {} to {}...".format(tar_path, extract_to))
-    with tarfile.open(tar_path, "r:bz2") as tar:
-        tar.extractall(path=extract_to)
+    try:
+        with tarfile.open(tar_path, "r:bz2") as tar:
+            tar.extractall(path=extract_to)
+    except:
+        return
     print("Extraction complete.")
 
 
@@ -47,7 +50,7 @@ def main():
     ctu13_tar_path = "datasets/ctu13.tar.bz2"
     ctu13_extract_path = "datasets/ctu13"
     if os.path.exists(ctu13_extract_path):
-        print("File already exists at {}, skipping download.".format(ctu13_extract_path))
+        print("File already exists at {}, skipping download and extract.".format(ctu13_extract_path))
     else:
         download_file(ctu13_url, ctu13_tar_path)
         extract_tar_bz2(ctu13_tar_path, ctu13_extract_path)
