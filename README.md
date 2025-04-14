@@ -14,8 +14,8 @@ We compare two types of feature sets:
 `cd NETXAI `  
 
 ## 📦 2. Set up the Environment
-Install dependencies via:
-`pip install -r requirements.txt`
+Install dependencies via:   
+`pip install -r requirements.txt`    
 **We recommend using Python 3.12 and a virtual environment.**
 
 
