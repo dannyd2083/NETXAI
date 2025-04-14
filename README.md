@@ -143,6 +143,8 @@ Options:
 
 ### 🔍 Run a single model independently
 
+⚠️ Before running any individual model script, make sure all data files and folders (e.g., `datasets/`, `features/`, `data_splits/`) have already been generated and are in the correct paths. You can do this by running the full pipeline first or preparing them manually.
+
 You can also run each model's training script manually with a specified feature set:
 
 ```
