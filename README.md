@@ -21,7 +21,7 @@ Install dependencies via:
 `pip install -r requirements.txt`    
 **We recommend using Python 3.12 and a virtual environment.**
 
-### ## 🔧 System Requirements
+### 🔧 System Requirements
 
 If you're using `macOS` and encounter issues with `LightGBM` or `XGBoost`, you may need to install `OpenMP`:
 
