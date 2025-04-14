@@ -98,7 +98,7 @@ results/
 
 
 ## 🚀 Usage
-### Note: To save time, we skip the hyperparameter search phase and directly use the best parameters previously identified through cross-validation. If you're interested in the tuning process, please refer to lgbm_model_training_procedure.py, logistic_regression_training_procedure.py and random_forest_training_procedure.py.
+### Note: To save time, we skip the hyperparameter search phase and directly use the best parameters previously identified through cross-validation. If you're interested in the tuning process, please refer to `lgbm_model_training_procedure.py`, `logistic_regression_training_procedure.py` and `random_forest_training_procedure.py`.
 You can run the full pipeline with:   
 `python main.py --feature_set <feature set> --model <model name>`   
 
