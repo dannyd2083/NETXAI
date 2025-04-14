@@ -3,7 +3,7 @@ This project replicates and extends the paper:
 "Integrating Explainable AI for Effective Malware Detection in Encrypted Network Traffic"
 by evaluating various machine learning models on flow-based network features.
 
-## **Note:** This project was developed and tested on **macOS**.
+## ⚠️ **Note:** This project was developed and tested on **macOS**.
 
 
 We compare two types of feature sets:
