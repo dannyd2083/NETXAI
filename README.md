@@ -176,4 +176,4 @@ results/
 
 Below are the evaluation results (Accuracy, Precision, Recall, F1-score, MCC) for each model on two different feature sets.
 
-![Results Overview](results/results.jpg)
+![Results Overview](results.jpg)
