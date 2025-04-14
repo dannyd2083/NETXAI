@@ -53,7 +53,7 @@ def main():
     print("\n Step 5: Training models...")
     for key, module in model_map.items():
         if selected_models is None or key in selected_models:
-            print(f"\n  Training model: {key.upper()}")
+            print(f"\n----->>>>>> Training model: {key.upper()}")
             module.main(feature_set)
 
     print("\n Step 6: Generating radar chart...")
